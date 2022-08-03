@@ -1,0 +1,11 @@
+(= macro (mac (sym params . body) (list '= sym (cons 'mac (cons params body)))))
+(macro func (sym params . body) (list '= sym (cons 'fn (cons params body))))
+(func each (f lst) (while lst (f (car lst)) (= lst (cdr lst))))
+
+(func loadSprites (data)
+    (let i (* 65 7 7))
+    (each (fn (it)
+        (poke (+ 0x4040 i) it)
+        (= i (+ i 1))
+    ) data)
+) 
