@@ -9,6 +9,9 @@
 (= dx 0)
 (= dy 0)
 
+; other data
+(= boxes (list (cons 1 3) (cons 1 5)))
+
 (loadSprites '(
     ; a / player
     0  0  1  1  1  1  0  
@@ -82,8 +85,14 @@
 
     (fill 0 0 width height " ")
 
-    (color 2)
-    (put 0 0 "a b c d e f")
+    (color 3)
+    (each (fn (box)
+        (put (car box) (cdr box) "b")
+    ) boxes)
+    ;(color 2)
+    ;(put 0 0 "a b c d e f")
+
+    (color 7)
     (put px py "a")
 ))
 
