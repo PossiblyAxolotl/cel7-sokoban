@@ -10,9 +10,11 @@
 (= dy 0)
 
 ; other data
-(= boxes (list (cons 1 3) (cons 3 5)))
-(= targets (list (cons 1 6) (cons 5 7)))
-(= exit (cons 14 14))
+(= boxes ())
+(= targets ())
+(= exit ())
+
+(= level 1)
 
 ; map
 (func outerWalls ()
@@ -22,6 +24,49 @@
     (fill 0 0 1 height "f")
     (fill (- width 1) 0 1 height "f")
 )
+
+; levels     createLevelNUMBER places the player, boxes, targets and exit. run once. levelNUMBER runs every frame to build level
+(func createLevel1 ()
+    (= px 7)
+    (= py 5)
+    (= boxes (list (cons 6 12) (cons 9 12)))
+    (= targets (list (cons 6 14) (cons 9 14)))
+    (= exit (cons 8 2))
+)
+(func level1 ()
+    (fill 5 1 1 15 "f") 
+    (fill 10 1 1 15 "f")
+    (put 7 12 "f")
+    (put 8 12 "f")
+)
+
+(func createLevel2 ()
+    (= px 7)
+    (= py 5)
+    (= boxes (list (cons 6 12) (cons 9 12)))
+    (= targets (list (cons 6 14) (cons 9 14)))
+    (= exit (cons 8 2))
+)
+(func level2 ()
+    (fill 11 3 13 4 "f") 
+    (put 4 6 "f")
+)
+
+; if level is 1, load level 1... etc..
+(func createLevel ()
+    (if (is level 1) (createLevel1)
+        (is level 2) (createLevel2)
+    )
+)
+
+; if level is 1, draw level 1... etc..
+(func levelWalls ()
+    (if (is level 1) (level1)
+        (is level 2) (level2)
+    )
+)
+
+(createLevel)
 
 ; loading all sprites as ascii
 (loadSprites '(
@@ -128,7 +173,10 @@
         (= closed 1))
     )targets)
 
-    (put 0 0 closed)
+    ;(put 0 0 closed)
+
+    (if (is closed 0) (= level (+ level 1)))
+    (createLevel)
 )
 
 (func move ()
@@ -155,7 +203,7 @@
     ; tiles
     (color 11)
     (outerWalls)
-    (put 11 3 "f")
+    (levelWalls)
 
     ; targets
     (color 10)
