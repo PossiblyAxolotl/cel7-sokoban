@@ -67,12 +67,22 @@
     1  0  1  1  1  0  1  
     1  0  0  0  0  0  1  
     1  1  1  1  1  1  1
+
+    ; g / hat
+    0  0  0  0  0  0  0  
+    0  0  0  0  0  0  0  
+    0  0  0  0  0  0  0  
+    0  0  0  0  0  0  0  
+    0  0  0  1  1  0  0  
+    0  1  0  1  1  0  1  
+    0  0  1  1  1  1  0
 ))
 
 ; move player and detect collisions
 (func moveBoxes ()
     (each (fn (box)
         (if (and (is (car box) (+ px dx) ) (is (cdr box) py) (is " " (get (+ px dx dx) py))) (setcar box (+ px dx dx)))
+        (if (and (is (cdr box) (+ py dy) ) (is (car box) px) (is " " (get px (+ py dy dy)))) (setcdr box (+ py dy dy)))
     ) boxes)
 )
 (func move ()
@@ -80,7 +90,7 @@
     (if (or (is "f" (get (+ px dx) py)) (is "b" (get (+ px dx) py))) (= dx 0)
         (= px (+ px dx))
     )
-    (if (is "f" (get px (+ py dy))) (= dy 0)
+    (if (or (is "f" (get px (+ py dy))) (is "b" (get px (+ py dy)))) (= dy 0)
         (= py (+ py dy))
     )
 
@@ -92,19 +102,26 @@
 (= step(fn ()
     (fill 0 0 width height " ")
 
+    ; tiles
     (put 11 3 "f")
 
+    ; boxes
     (color 3)
     (moveBoxes)
+
     (each (fn (box)
         (put (car box) (cdr box) "b")
     ) boxes)
-    ;(color 2)
-    ;(put 0 0 "a b c d e f")
 
+
+    ; player
     (move)
+
     (color 7)
     (put px py "a")
+
+    (color 4)
+    (put px (- py 1) "g")
 ))
 
 (= keydown (fn (k)
