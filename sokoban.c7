@@ -11,6 +11,8 @@
 
 ; other data
 (= boxes (list (cons 1 3) (cons 3 5)))
+(= targets (list (cons 1 6) (cons 5 7)))
+(= exit (cons 14 14))
 
 ; map
 (func outerWalls ()
@@ -35,7 +37,7 @@
     ; b / box
     1  1  1  1  1  1  1  
     1  0  0  0  0  0  1  
-    1  0  1  1  1  0  1  
+    1  0  0  0  0  0  1  
     1  0  0  0  0  0  1  
     1  1  1  1  1  1  1  
     1  0  0  0  0  0  1  
@@ -76,6 +78,24 @@
     1  0  1  1  1  0  1  
     1  0  0  0  0  0  1  
     1  1  1  1  1  1  1
+
+    ; g / active box
+    1  1  1  1  1  1  1  
+    1  0  0  0  0  0  1  
+    1  0  1  1  1  0  1  
+    1  0  0  0  0  0  1  
+    1  1  1  1  1  1  1  
+    1  0  0  0  0  0  1  
+    1  1  1  1  1  1  1
+
+    ; h / wall edge
+    0  0  0  0  0  0  0  
+    1  1  1  1  0  1  1  
+    0  0  0  0  0  0  0  
+    1  1  0  1  1  1  1  
+    0  0  0  0  0  0  0  
+    1  1  1  1  0  1  1  
+    0  0  0  0  0  0  0
 ))
 
 ; edits the " " character to have a dot in the middle
@@ -84,10 +104,23 @@
 ; move player and detect collisions
 (func moveBoxes ()
     (each (fn (box)
+        ;if blank move box
         (if (and (is (car box) (+ px dx) ) (is (cdr box) py) (is " " (get (+ px dx dx) py))) (setcar box (+ px dx dx)))
         (if (and (is (cdr box) (+ py dy) ) (is (car box) px) (is " " (get px (+ py dy dy)))) (setcdr box (+ py dy dy)))
+
+        ; if target move box
+        (if (and (is (car box) (+ px dx) ) (is (cdr box) py) (is "c" (get (+ px dx dx) py))) (setcar box (+ px dx dx)))
+        (if (and (is (cdr box) (+ py dy) ) (is (car box) px) (is "c" (get px (+ py dy dy)))) (setcdr box (+ py dy dy)))
     ) boxes)
 )
+
+(func checkTargets
+    (= tCount 0)
+    (each (fn (target)
+        (if (is (get (car target) (cdr target)) "b") (put (car target) (cdr target) "g"))
+    )targets)
+)
+
 (func move ()
 
     (if (or (is "f" (get (+ px dx) py)) (is "b" (get (+ px dx) py))) (= dx 0)
@@ -112,6 +145,13 @@
     (outerWalls)
     (put 11 3 "f")
 
+    ; targets
+    (color 10)
+
+    (each (fn (target)
+        (put (car target) (cdr target) "c")
+    ) targets)
+
     ; boxes
     (color 3)
     (moveBoxes)
@@ -120,6 +160,10 @@
         (put (car box) (cdr box) "b")
     ) boxes)
 
+    (checkTargets)
+
+    (color 9)
+    (put (car exit) (cdr exit) "d")
 
     ; player
     (move)
