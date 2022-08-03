@@ -6,6 +6,8 @@
 ; player
 (= px 0)
 (= py 0)
+(= dx 0)
+(= dy 0)
 
 (loadSprites '(
     ; a / player
@@ -63,7 +65,21 @@
     1  1  1  1  1  1  1
 ))
 
+(func move ()
+    (if (is "f" (get (+ px dx) py)) (= dx 0)
+        (= px (+ px dx))
+    )
+    (if (is "f" (get px (+ py dy))) (= dy 0)
+        (= py (+ py dy))
+    )
+
+    (= dx 0)
+    (= dy 0)
+)
+
 (= step(fn ()
+    (move)
+
     (fill 0 0 width height " ")
 
     (color 2)
@@ -72,8 +88,9 @@
 ))
 
 (= keydown (fn (k)
-    (if (is k "up") (= py (- py 1))
-       (is k "down") (= py (+ py 1))
-       (is k "left") (= px (- px 1))
-       (is k "right") (= px (+ px 1))
-)))
+    (if (is k "up") (= dy -1)
+       (is k "down") (= dy 1)
+       (is k "left") (= dx -1)
+       (is k "right") (= dx 1)
+    )
+))
