@@ -64,6 +64,16 @@
 ))
 
 (= step(fn ()
+    (fill 0 0 width height " ")
+
     (color 2)
     (put 0 0 "a b c d e f")
+    (put px py "a")
 ))
+
+(= keydown (fn (k)
+    (if (is k "up") (= py (- py 1))
+       (is k "down") (= py (+ py 1))
+       (is k "left") (= px (- px 1))
+       (is k "right") (= px (+ px 1))
+)))
