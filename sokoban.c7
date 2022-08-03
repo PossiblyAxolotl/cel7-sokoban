@@ -10,8 +10,9 @@
 (= dy 0)
 
 ; other data
-(= boxes (list (cons 1 3) (cons 1 5)))
+(= boxes (list (cons 1 3) (cons 3 5)))
 
+; loading all sprites as ascii
 (loadSprites '(
     ; a / player
     0  0  1  1  1  1  0  
@@ -68,8 +69,15 @@
     1  1  1  1  1  1  1
 ))
 
+; move player and detect collisions
+(func moveBoxes ()
+    (each (fn (box)
+        (if (and (is (car box) (+ px dx) ) (is (cdr box) py) (is " " (get (+ px dx dx) py))) (setcar box (+ px dx dx)))
+    ) boxes)
+)
 (func move ()
-    (if (is "f" (get (+ px dx) py)) (= dx 0)
+
+    (if (or (is "f" (get (+ px dx) py)) (is "b" (get (+ px dx) py))) (= dx 0)
         (= px (+ px dx))
     )
     (if (is "f" (get px (+ py dy))) (= dy 0)
@@ -80,18 +88,21 @@
     (= dy 0)
 )
 
+; step, run every frame
 (= step(fn ()
-    (move)
-
     (fill 0 0 width height " ")
 
+    (put 11 3 "f")
+
     (color 3)
+    (moveBoxes)
     (each (fn (box)
         (put (car box) (cdr box) "b")
     ) boxes)
     ;(color 2)
     ;(put 0 0 "a b c d e f")
 
+    (move)
     (color 7)
     (put px py "a")
 ))
