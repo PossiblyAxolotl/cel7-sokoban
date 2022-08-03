@@ -78,6 +78,9 @@
     1  1  1  1  1  1  1
 ))
 
+; edits the " " character to have a dot in the middle
+(poke 0x4058 1)
+
 ; move player and detect collisions
 (func moveBoxes ()
     (each (fn (box)
@@ -100,6 +103,8 @@
 
 ; step, run every frame
 (= step(fn ()
+    ; clear screen to dots
+    (color 15)
     (fill 0 0 width height " ")
 
     ; tiles
@@ -123,6 +128,7 @@
     (put px py "a")
 ))
 
+; makes sure you only do 1 input per move
 (= keydown (fn (k)
     (if (is k "up") (= dy -1)
        (is k "down") (= dy 1)
