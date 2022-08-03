@@ -114,19 +114,31 @@
     ) boxes)
 )
 
-(func checkTargets
+(func checkTargets ()
     (= tCount 0)
     (each (fn (target)
         (if (is (get (car target) (cdr target)) "b") (put (car target) (cdr target) "g"))
     )targets)
 )
 
+(func checkBoxes ()
+    (= closed 1)
+    (each (fn (target)
+        (if (is (get (car target) (cdr target)) "g") (= closed 0)
+        (= closed 1))
+    )targets)
+
+    (put 0 0 closed)
+)
+
 (func move ()
 
     (if (or (is "f" (get (+ px dx) py)) (is "b" (get (+ px dx) py))) (= dx 0)
+        (is "d" (get (+ px dx) py)) (checkBoxes)
         (= px (+ px dx))
     )
     (if (or (is "f" (get px (+ py dy))) (is "b" (get px (+ py dy)))) (= dy 0)
+        (is "d" (get px (+ py dy))) (checkBoxes)
         (= py (+ py dy))
     )
 
