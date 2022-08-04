@@ -25,7 +25,7 @@
     (fill (- width 1) 0 1 height "f")
 )
 
-; levels     createLevelNUMBER places the player, boxes, targets and exit. run once. levelNUMBER runs every frame to build level
+; levels     createLevelNUMBER places the player, boxes, targets and exit. run once. levelNUMBER runs every frame to build level walls
 (func createLevel1 ()
     (= px 7)
     (= py 5)
@@ -159,13 +159,15 @@
     ) boxes)
 )
 
+;   check which targets are active and make box
 (func checkTargets ()
-    (= tCount 0)
+    ; runs through each target. if there is the letter b (represents boxes) in the spot the target is, it replaces it with g, the active box
     (each (fn (target)
         (if (is (get (car target) (cdr target)) "b") (put (car target) (cdr target) "g"))
     )targets)
 )
 
+; if all targets have boxes, door is open
 (func checkBoxes ()
     (= closed 1)
     (each (fn (target)
