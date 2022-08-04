@@ -132,15 +132,6 @@
     1  1  1  1  1  1  1  
     1  0  0  0  0  0  1  
     1  1  1  1  1  1  1
-
-    ; h / wall edge
-    0  0  0  0  0  0  0  
-    1  1  1  1  0  1  1  
-    0  0  0  0  0  0  0  
-    1  1  0  1  1  1  1  
-    0  0  0  0  0  0  0  
-    1  1  1  1  0  1  1  
-    0  0  0  0  0  0  0
 ))
 
 ; edits the " " character to have a dot in the middle
@@ -150,6 +141,7 @@
 (func moveBoxes ()
     (each (fn (box)
         ;if blank move box
+        (put (car box) (cdr box) " ")
         (if (and (is (car box) (+ px dx) ) (is (cdr box) py) (is " " (get (+ px dx dx) py))) (setcar box (+ px dx dx)))
         (if (and (is (cdr box) (+ py dy) ) (is (car box) px) (is " " (get px (+ py dy dy)))) (setcdr box (+ py dy dy)))
 
@@ -169,29 +161,32 @@
 
 ; if all targets have boxes, door is open
 (func checkBoxes ()
-    (= closed 1)
+    ; if closed = 1, player can't leave. if closed = 0, player can leave
+    (= closed 0)
     (each (fn (target)
-        (if (is (get (car target) (cdr target)) "g") (= closed 0)
-        (= closed 1))
+        (if (is (get (car target) (cdr target)) "g") (put (car target) (cdr target) "g") ; this is just so it does something, the else part is what matters
+        (= closed 1)) ; if there is not a box on a target, set closed to 1 until next check
     )targets)
 
     ;(put 0 0 closed)
 
-    (if (is closed 0) (= level (+ level 1)))
-    (createLevel)
+    (if (is closed 0) (= level (+ level 1))) ; if door is open add 1 to the level count
+    (createLevel) ; load level. if level doesn't change the door restarts
 )
 
+; player movement
 (func move ()
 
-    (if (or (is "f" (get (+ px dx) py)) (is "b" (get (+ px dx) py))) (= dx 0)
-        (is "d" (get (+ px dx) py)) (checkBoxes)
-        (= px (+ px dx))
+    (if (or (is "f" (get (+ px dx) py)) (is "b" (get (+ px dx) py))) (= dx 0) ; if there's a wall or box in front of player, don't move
+        (is "d" (get (+ px dx) py)) (checkBoxes) ; if there is a box, run the checkboxes stuff
+        (= px (+ px dx)) ; if nothing went wrong move the player
     )
-    (if (or (is "f" (get px (+ py dy))) (is "b" (get px (+ py dy)))) (= dy 0)
+    (if (or (is "f" (get px (+ py dy))) (is "b" (get px (+ py dy)))) (= dy 0) ; same as the last 3 but vertical instead of horizontal
         (is "d" (get px (+ py dy))) (checkBoxes)
         (= py (+ py dy))
     )
 
+    ; reset the dx and dy
     (= dx 0)
     (= dy 0)
 )
@@ -202,39 +197,44 @@
     (color 15)
     (fill 0 0 width height " ")
 
-    ; tiles
+    ; draw level tiles
     (color 11)
     (outerWalls)
     (levelWalls)
 
-    ; targets
+    ; draw targets
     (color 10)
 
     (each (fn (target)
         (put (car target) (cdr target) "c")
     ) targets)
 
-    ; boxes
+    ; draw boxes and box logic
     (color 3)
+    (each (fn (box)
+        (put (car box) (cdr box) "b")
+    ) boxes)
+
     (moveBoxes)
 
     (each (fn (box)
         (put (car box) (cdr box) "b")
     ) boxes)
 
-    (checkTargets)
+    (checkTargets) ; check if boxes are on targets (could probably be called checkBoxes bozo)
 
+    ; draw exit
     (color 9)
     (put (car exit) (cdr exit) "d")
 
-    ; player
+    ; draw player & player logic
     (move)
 
     (color 7)
     (put px py "a")
 ))
 
-; makes sure you only do 1 input per move
+; makes sure you only do 1 input per move, dx and dy are the selected inputs so we can check if they are valid in other parts
 (= keydown (fn (k)
     (if (is k "up") (= dy -1)
        (is k "down") (= dy 1)
